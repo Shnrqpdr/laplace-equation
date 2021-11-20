@@ -6,8 +6,8 @@
 
 #define N 1002
 #define tolerance 0.01
-#define maxIt 10
-#define errorTolerance 1e-6
+#define maxIt 1000000
+#define errorTolerance 1e-16
 #define potencialInterno -50.0
 #define potencialExterno 100.0
 #define raioInterno 1.0
@@ -30,12 +30,12 @@ void setCondicoesContorno(double **v, double dx, double dy){
             y = yInicial + j*dy;
             r = sqrt(x*x + y*y);
 
-            if(abs(raioExterno - r) < tolerance){
+            if(fabs(raioExterno - r) < tolerance){
                 v[i][j] = potencialExterno;
             }
             else{
 
-                if(abs(raioInterno - r) < tolerance){
+                if(fabs(raioInterno - r) < tolerance){
                     v[i][j] = potencialInterno;
                 }
             } 
@@ -53,11 +53,11 @@ void setCorteAngulo(double **v, double dx, double dy){
             r = sqrt(x*x + y*y);
             ang = acos(x/r);
 
-            if(abs(raioExterno - r) < tolerance && ang < theta){
+            if(fabs(raioExterno - r) < tolerance && ang < theta){
                 v[i][j] = 0;
             }
             else{
-                if(abs(raioInterno - r) < tolerance && ang < theta){
+                if(fabs(raioInterno - r) < tolerance && ang < theta){
                     v[i][j] = 0;
                 }
             }

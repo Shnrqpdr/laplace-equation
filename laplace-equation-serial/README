@@ -1,0 +1,49 @@
+-------------------------------------------------------------------------------------------- %
+
+                                ------- HPC 1 --------
+
+    Nesse problema, resolvemos a equação de laplace aplicando condições de contorno 
+    sob uma circunferência que possui um corte de um arco por um certo ângulo que 
+    pode ser escolhido de acordo com o usuario na variável theta.
+
+    Caso deseje utilizar outros números para fazer a simulação, basta muda-los
+    no codigo eletric-potential.c, na parte de "Declarações e Constantes".
+
+------------------------------------------------------------------------------------------- %
+
+    ! INSTRUÇÕES DE USO CONVENCIONAIS !
+
+        Para compilar o programa, utilizamos o MAKEFILE, portanto basta 
+        utilizar os seguintes comandos para compilar e rodar o programa:
+
+        >> make
+        >> time ./laplace.x
+
+        O comando "time" irá captar o tempo de execução do programa.
+
+    ! INSTRUÇÕES DE USO EXCEPCIONAIS !
+
+        Caso disponha das bibliotecas numpy, matplotlib e pandas em seu computador,
+        poderá rodar o programa e plotar a saída de dados, resultando em uma figura PNG. 
+        Nesse caso, basta utilizar os comandos:
+
+        >> make
+        >> chmod +x script.sh
+        >> time ./script.sh
+
+------------------------------------------------------------------------------------------- %
+
+    ! LIMPEZA DE ARQUIVOS PARA RODAR O PROGRAMA NOVAMENTE !
+
+    Caso deseje limpar os arquivos de output anteriores e rodar novamente
+    basta utilizar o comando clean do makefile:
+
+    >> make clean
+
+------------------------------------------------------------------------------------------- %
+
+    Esse programa é uma versão serial e inicial, que será melhorado ao longo do curso.
+    Agradecimentos ao meu amigo Victor Dieguez, pelas discussões a cerca do código e
+    outra coisas mais.
+
+------------------------------------------------------------------------------------------- %

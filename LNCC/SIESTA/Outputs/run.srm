@@ -1,0 +1,35 @@
+#!/bin/bash
+#SBATCH --nodes=1           #Numero de Nós
+#SBATCH --ntasks-per-node=1  #Numero de tarefas por Nó
+#SBATCH --cpus-per-task=1   #Numero de threads por tarefa MPI
+#SBATCH -p cpu_dev         #Fila (partition) a ser utilizada
+#SBATCH -J Benzene_O0   #Nome job
+#SBATCH --exclusive          #Utilização exclusiva dos nós durante a execução do job
+
+#Exibe os nos alocados para o Job
+echo $SLURM_JOB_NODELIST
+nodeset -e $SLURM_JOB_NODELIST
+
+cd $SLURM_SUBMIT_DIR
+
+#Configura os compiladores
+#module load gcc/6.5
+module load cfitsio/3.450_gnu
+module load ccfits/2.5_gnu
+module load gnu-common/1.8
+module load gcc/8.3
+
+#cp $dir/benzene.fdf .
+#cp $dir/C.psf .
+#cp $dir/H.psf .
+#cp $dir/rodar_benzeno.sh .
+#cp $dir/siesta .
+
+#chmod +x rodar_benzeno.sh
+
+#exibe informaçoes sobre o executavel
+EXEC=/scratch/uff21hpc/pedro.cunha/Siesta/siesta-v4.0.2/Obj-gnu/siesta 
+OUT=/prj/uff21hpc/pedro.cunha/Outputs
+
+srun -n $SLURM_NTASKS time $EXEC < benzene.fdf | tee benzene_O0_output_native.txt
+wait

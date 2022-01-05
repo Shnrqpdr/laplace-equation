@@ -1,8 +1,9 @@
 CC=gcc
 CFLAGS=-lm
+COMPILER_FLAGS=-pg -g
 
 laplace.x: eletric-potential.o
-	$(CC) -o laplace.x eletric-potential.o $(CFLAGS)
+	$(CC) $(COMPILER_FLAGS) -o laplace.x eletric-potential.o $(CFLAGS)
 
 .PHONY: clean
 

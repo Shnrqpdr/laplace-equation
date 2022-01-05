@@ -5,9 +5,9 @@
 // Declarações e constantes
 
 #define N 1002
-#define tolerance 0.01
-#define maxIt 1000000
-#define errorTolerance 1e-16
+#define tolerance 0.1
+#define maxIt 10000000
+#define errorTolerance 1e-8
 #define potencialInterno -50.0
 #define potencialExterno 100.0
 #define raioInterno 1.0
@@ -24,8 +24,8 @@
 void setCondicoesContorno(double **v, double dx, double dy){
     double x, y, r;
 
-    for(int i = 1; i < N-1; i++){
-        for(int j = 1; j < N-1; j++){
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
             x = xInicial + i*dx;
             y = yInicial + j*dy;
             r = sqrt(x*x + y*y);
@@ -46,18 +46,18 @@ void setCondicoesContorno(double **v, double dx, double dy){
 void setCorteAngulo(double **v, double dx, double dy){
     double x, y, r, ang;
 
-    for(int i = 1; i < N-1; i++){
-        for(int j = 1; j < N-1; j++){
+    for(int i = 0; i < N; i++){
+        for(int j = 0; j < N; j++){
             x = xInicial + i*dx;
             y = yInicial + j*dy;
             r = sqrt(x*x + y*y);
             ang = acos(x/r);
 
-            if(fabs(raioExterno - r) < tolerance && ang < theta){
+            if(fabs(raioExterno - r) < tolerance && ang < theta/2.0){
                 v[i][j] = 0;
             }
             else{
-                if(fabs(raioInterno - r) < tolerance && ang < theta){
+                if(fabs(raioInterno - r) < tolerance && ang < theta/2.0){
                     v[i][j] = 0;
                 }
             }
@@ -139,7 +139,6 @@ void calculoPotencial(double **v, double **v_old, double dx, double dy){
         normaDif = fabs((normaV - normaV_old)/normaV_old);
 
         if(normaDif < errorTolerance){
-            printf("\nRetornando\n");
             return;
         }
     }

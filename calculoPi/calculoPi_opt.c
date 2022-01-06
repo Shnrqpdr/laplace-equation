@@ -4,7 +4,6 @@
 #include <time.h>
 
 #define N 100000
-#define NUMBER_CHUNK 1000
 
 int main(int argc, char *argv[]){
 
@@ -13,8 +12,9 @@ int main(int argc, char *argv[]){
 
     data = fopen(argv[1], "w+");
 
-	double pi, x_coordinate, y_coordinate, circle_count, realTime;
-    long realTimeSec, realTimeNano;
+    fprintf(data, "NT\tPI\tCH\tT\n");
+
+	double pi, x_coordinate, y_coordinate, circle_count, realTime, realTimeSec, realTimeNano;
 	int step, chunk, numberSteps, numberThreads, tid, n;
 	
     pi = 0.0;
@@ -22,12 +22,11 @@ int main(int argc, char *argv[]){
 	y_coordinate = 0.0;
     circle_count = 0.0;
 
-    chunk = NUMBER_CHUNK;
 	numberSteps = N;
     tid = -1;
     srand(time(NULL));
     
-    for(chunk = 1; chunk <= 1001; chunk+=100){
+    for(chunk = 1; chunk <= 10001; chunk+=100){
 
     	numberThreads = 8;
 
@@ -59,7 +58,7 @@ int main(int argc, char *argv[]){
             realTimeNano = end.tv_nsec - begin.tv_nsec;
 			realTime = realTimeSec + realTimeNano*1e-9;
 
-    		fprintf(data, "%d\t%lf\t%d\t%lf\n", numberThreads, pi, chunk, realTime);
+    		fprintf(data, "%d %lf %d %lf\n", numberThreads, pi, chunk, realTime);
    			numberThreads--;
 
    		}

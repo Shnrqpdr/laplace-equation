@@ -12,20 +12,16 @@ int main(int argc, char *argv[]){
 
     data = fopen(argv[1], "w+");
 
-	double pi, x_coordinate, y_coordinate, circle_count, realTime;
-    long realTimeNano, realTimeSec;
-    int step, n, numberSteps;
+    fprintf(data, "PI\tT\n");
+
+	double pi, x_coordinate, y_coordinate, circle_count, realTime, realTimeNano, realTimeSec;
+    int step, numberSteps;
 
     pi = 0.0;
 	x_coordinate = 0.0;
 	y_coordinate = 0.0;
     circle_count = 0.0;
-
     numberSteps = N;
-    pi = 0.0;
-	x_coordinate = 0.0;
-	y_coordinate = 0.0;
-    circle_count = 0.0;
 
     clock_gettime(CLOCK_REALTIME, &begin);
 
@@ -46,7 +42,7 @@ int main(int argc, char *argv[]){
     realTimeNano = end.tv_nsec - begin.tv_nsec;
 	realTime = realTimeSec + realTimeNano*1e-9;
 
-    fprintf(data, "%lf\t%d\t%lf\n", pi, n, realTime);
+    fprintf(data, "%lf %lf\n", pi, realTime);
 
     fclose(data);
 

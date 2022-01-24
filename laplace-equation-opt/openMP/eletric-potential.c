@@ -23,52 +23,75 @@
 #define yInicial -5.0
 #define yFinal 5.0
 
-void setContour(double **v, double dx, double dy){
+void setContour(double **v, double dx, double dy, int chunk){
+    int i, j;
     double x, y, r;
 
-    for(int i = 0; i < N/2; i++){
-        for(int j = 0; j < N/2; j++){
-            x = xInicial + i*dx;
-            y = yInicial + j*dy;
-            r = sqrt(x*x + y*y);
+    omp_set_num_threads(numberThreads);
+    #pragma omp parallel private(x, y, r, i, j)
+    {
 
-            if(fabs(raioExterno - r) < tolerance){
-                v[i][j] = potencialExterno;
-                v[N-i-1][j] = potencialExterno;
-                v[i][N-j-1] = potencialExterno;
-                v[N-i-1][N-j-1] = potencialExterno;
-            }
-            else{
+        for(int i = 0; i < N/2; i++){
 
-                if(fabs(raioInterno - r) < tolerance){
-                    v[i][j] = potencialInterno;
-                    v[N-i-1][j] = potencialInterno;
-                    v[i][N-j-1] = potencialInterno;
-                    v[N-i-1][N-j-1] = potencialInterno;
+            #pragma omp parallel shared(v)
+            {
+                #pragma omp for schedule(dynamic, chunk)
+
+                for(int j = 0; j < N/2; j++){
+                    x = xInicial + i*dx;
+                    y = yInicial + j*dy;
+                    r = sqrt(x*x + y*y);
+
+                    if(fabs(raioExterno - r) < tolerance){
+                        v[i][j] = potencialExterno;
+                        v[N-i-1][j] = potencialExterno;
+                        v[i][N-j-1] = potencialExterno;
+                        v[N-i-1][N-j-1] = potencialExterno;
+                    }
+                    else{
+
+                        if(fabs(raioInterno - r) < tolerance){
+                            v[i][j] = potencialInterno;
+                            v[N-i-1][j] = potencialInterno;
+                            v[i][N-j-1] = potencialInterno;
+                            v[N-i-1][N-j-1] = potencialInterno;
+                        }
+                    } 
                 }
-            } 
+            }
         }
     }
 }
 
-void setAngleCut(double **v, double dx, double dy){
+void setAngleCut(double **v, double dx, double dy, int chunk){
+    int i, j;
     double x, y, r, ang;
 
-    for(int i = N/2; i < N; i++){
-        for(int j = N/2; j < N; j++){
-            x = xInicial + i*dx;
-            y = yInicial + j*dy;
-            r = sqrt(x*x + y*y);
-            ang = acos(x/r);
+    omp_set_num_threads(numberThreads);
+    #pragma omp parallel private(x, y, r, ang, i, j)
+    {
+        for(i = 0; i < N/2; i++){
 
-            if(fabs(raioExterno - r) < tolerance && ang < theta){
-                v[i][j] = 0;
-                v[i][N-j-1] = 0;
-            }
-            else{
-                if(fabs(raioInterno - r) < tolerance && ang < theta){
-                    v[i][j] = 0;
-                    v[i][N-j-1] = 0;
+            #pragma omp parallel shared(v)
+            {
+                #pragma omp for schedule(dynamic, chunk)
+
+                for(j = N/2; j < N; j++){
+                    x = xInicial + i*dx;
+                    y = yInicial + j*dy;
+                    r = sqrt(x*x + y*y);
+                    ang = acos(x/r);
+
+                    if(fabs(raioExterno - r) < tolerance && ang < theta){
+                        v[i][j] = 0;
+                        v[i][N-j-1] = 0;
+                    }
+                    else{
+                        if(fabs(raioInterno - r) < tolerance && ang < theta){
+                            v[i][j] = 0;
+                            v[i][N-j-1] = 0;
+                        }
+                    }
                 }
             }
         }
@@ -123,23 +146,25 @@ void potentialCalc(double **v, double **v_old, double dx, double dy, int chunk){
         for(i = 1; i < N-1; i++){
 
             #pragma omp parallel shared(v, v_old)
-            #pragma omp for schedule(dynamic, chunk)
+            {
+                #pragma omp for schedule(dynamic, chunk)
 
-            for(j = N/2; j < N-1; j++){
+                for(j = N/2; j < N-1; j++){
 
-                x = xInicial + i*dx;
-                y = yInicial + j*dy;
-                r = sqrt(x*x + y*y);
-                if(fabs(raioExterno - r) < tolerance && (v[i][j] == potencialExterno )){
-                    v[i][j] = potencialExterno;
-                }
-                else{
-                    if(fabs(raioInterno - r) < tolerance && (v[i][j] == potencialInterno)){
-                        v[i][j] = potencialInterno;
+                    x = xInicial + i*dx;
+                    y = yInicial + j*dy;
+                    r = sqrt(x*x + y*y);
+                    if(fabs(raioExterno - r) < tolerance && (v[i][j] == potencialExterno )){
+                        v[i][j] = potencialExterno;
                     }
                     else{
-                        v[i][j] = (1.0/4.0)*(v_old[i+1][j] + v_old[i-1][j] + v_old[i][j+1] + v_old[i][j-1]); 
-                        v[i][N-j-1] = v[i][j];
+                        if(fabs(raioInterno - r) < tolerance && (v[i][j] == potencialInterno)){
+                            v[i][j] = potencialInterno;
+                        }
+                        else{
+                            v[i][j] = (1.0/4.0)*(v_old[i+1][j] + v_old[i-1][j] + v_old[i][j+1] + v_old[i][j-1]); 
+                            v[i][N-j-1] = v[i][j];
+                        }
                     }
                 }
             }
@@ -191,8 +216,8 @@ int main(int argc, char *argv[]){
         v_old[i] = malloc(N*sizeof(double));
     }
 
-    setContour(v, dx, dy);
-    setAngleCut(v, dx, dy);
+    setContour(v, dx, dy, chunk);
+    setAngleCut(v, dx, dy, chunk);
     finiteDifference(v, v_old, dx, dy, chunk);
     getResults(v, dx, dy);
 

@@ -9,10 +9,11 @@ tab = '\t'
 i = 1
 tempos = array_file['tempo']
 
-print(f'eficiencia{tab}threads{tab}speedup\n')
+print(f'eficiencia{tab}threads{tab}speedup{tab}aceleracao\n')
 
 while(i <= 8):
     eficiencia = (1 - (tempos[i-1])/piorCaso)*100
     speedup = piorCaso/tempos[i-1];
-    print(f'{eficiencia}{tab}{i}{tab}{speedup}')
+    aceleracao = 1 - tempos[i-1]/((i)*piorCaso);
+    print(f'{eficiencia}{tab}{i}{tab}{speedup}{tab}{aceleracao}')
     i = i+1

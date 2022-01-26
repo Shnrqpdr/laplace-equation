@@ -31,13 +31,13 @@ void setContour(double **v, double dx, double dy, int chunk){
     #pragma omp parallel private(x, y, r, i, j)
     {
 
-        for(int i = 0; i < N/2; i++){
+        for(i = 0; i < N/2; i++){
 
             #pragma omp parallel shared(v)
             {
                 #pragma omp for schedule(dynamic, chunk)
 
-                for(int j = 0; j < N/2; j++){
+                for(j = 0; j < N/2; j++){
                     x = xInicial + i*dx;
                     y = yInicial + j*dy;
                     r = sqrt(x*x + y*y);
@@ -98,23 +98,6 @@ void setAngleCut(double **v, double dx, double dy, int chunk){
     }
 }
 
-double infinityNorm(double **M, int nL, int nC){
-
-    double norma = 0, soma = 0;
-
-    for(int i = 0; i < nL; i++){
-        for(int j = 0; j < nC; j++){
-            soma = soma + fabs(M[i][j]);
-        }
-        if(norma < soma){
-            norma = soma;
-        }
-        soma = 0;
-    }
-
-    return norma;
-}
-
 void getResults(double **v, double dx, double dy){
 
     double x, y;
@@ -173,9 +156,12 @@ void potentialCalc(double **v, double **v_old, double dx, double dy, int chunk){
 }
 
 void finiteDifference(double **v, double **v_old, double dx, double dy, int chunk){
-
+    
+    int i, j;
     double x, y, r;
-    long double normaV, normaV_old, normaDif;
+
+    #pragma omp parallel private(x, y, r, i, j, k) shared(v, v_old)
+    {
 
     for(int k = 0; k < maxIt; k++){
 
@@ -183,14 +169,31 @@ void finiteDifference(double **v, double **v_old, double dx, double dy, int chun
 		for(int b = 0; b < N; b++)
 			v_old[a][b] = v[a][b];
 		
-        potentialCalc(v, v_old, dx, dy, chunk);
+        omp_set_num_threads(numberThreads);
 
-        normaV = infinityNorm(v, N, N);
-        normaV_old = infinityNorm(v_old, N, N);
-        normaDif = fabs((normaV - normaV_old)/normaV_old);
+            for(i = 1; i < N-1; i++){
 
-        if(normaDif < errorTolerance){
-            return;
+                #pragma omp for schedule(dynamic, chunk)
+
+                for(j = N/2; j < N-1; j++){
+
+                    x = xInicial + i*dx;
+                    y = yInicial + j*dy;
+                    r = sqrt(x*x + y*y);
+                    if(fabs(raioExterno - r) < tolerance && (v[i][j] == potencialExterno )){
+                        v[i][j] = potencialExterno;
+                    }
+                    else{
+                        if(fabs(raioInterno - r) < tolerance && (v[i][j] == potencialInterno)){
+                            v[i][j] = potencialInterno;
+                        }
+                        else{
+                            v[i][j] = (1.0/4.0)*(v_old[i+1][j] + v_old[i-1][j] + v_old[i][j+1] + v_old[i][j-1]); 
+                            v[i][N-j-1] = v[i][j];
+                        }
+                    }
+                }
+            }
         }
     }
 }

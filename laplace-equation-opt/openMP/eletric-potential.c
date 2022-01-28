@@ -7,7 +7,7 @@
 
 #define N 1000
 #define tolerance 0.1
-#define maxIt 100000000
+#define maxIt 1000000
 #define potencialInterno -50.0
 #define potencialExterno 100.0
 #define raioInterno 1.0
@@ -106,13 +106,13 @@ void finiteDifference(double **v, double **v_old, double dx, double dy, int chun
 
     #pragma omp parallel private(a, b, x, y, r, i, j, k) shared(v, v_old)
     {
+        #pragma omp for schedule(dynamic, chunk)
+
         for(k = 0; k < maxIt; k++){
 
             for(a = 0; a < N; a++)
             for(b = 0; b < N; b++)
                 v_old[a][b] = v[a][b];
-            
-            #pragma omp for schedule(dynamic, chunk) collapse(2)
 
             for(i = 1; i < N-1; i++){
                 for(j = N/2; j < N-1; j++){
@@ -145,7 +145,7 @@ int main(int argc, char *argv[]){
     double **v, **v_old;
 
     numberThreads = atoi(argv[1]);
-    chunk = N/numberThreads;
+    chunk = maxIt/numberThreads;
 
     dx = (xFinal - xInicial)/N;
     dy = (yFinal - yInicial)/N;

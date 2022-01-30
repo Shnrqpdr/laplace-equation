@@ -7,7 +7,8 @@
 
 #define N 1000
 #define tolerance 0.1
-#define maxIt 100000000
+#define maxIt 1000000
+#define errorTolerance 1e-8
 #define potencialInterno -50.0
 #define potencialExterno 100.0
 #define raioInterno 1.0
@@ -76,6 +77,23 @@ void setAngleCut(double **v, double dx, double dy, int chunk, int numberThreads)
     }
 }
 
+double infinityNorm(double **M, int nL, int nC){
+
+    double norma = 0, soma = 0;
+
+    for(int i = 0; i < nL; i++){
+        for(int j = 0; j < nC; j++){
+            soma = soma + fabs(M[i][j]);
+        }
+        if(norma < soma){
+            norma = soma;
+        }
+        soma = 0;
+    }
+
+    return norma;
+}
+
 void getResults(double **v, double dx, double dy){
 
     int i, j;
@@ -97,42 +115,57 @@ void getResults(double **v, double dx, double dy){
     fclose(arquivo);
 }
 
-void finiteDifference(double **v, double **v_old, double dx, double dy, int chunk, int numberThreads){
-    
-    int a, b, i, j, k;
+void potentialCalc(double **v, double **v_old, double dx, double dy){
+
+    int i, j;
     double x, y, r;
+
+    for(i = 1; i < N-1; i++){
+        for(j = N/2; j < N-1; j++){
+            x = xInicial + i*dx;
+            y = yInicial + j*dy;
+            r = sqrt(x*x + y*y);
+            if(fabs(raioExterno - r) < tolerance && (v[i][j] == potencialExterno )){
+                v[i][j] = potencialExterno;
+            }
+            else{
+                if(fabs(raioInterno - r) < tolerance && (v[i][j] == potencialInterno)){
+                    v[i][j] = potencialInterno;
+                }
+                else{
+                    v[i][j] = (1.0/4.0)*(v_old[i+1][j] + v_old[i-1][j] + v_old[i][j+1] + v_old[i][j-1]); 
+                    v[i][N-j-1] = v[i][j];
+                }
+            }
+        }
+    }
+}
+
+void finiteDifference(double **v, double **v_old, double dx, double dy, int chunk, int numberThreads){
+
+    int a, b, k;
+    long double normaV, normaV_old, normaDif;
 
     omp_set_num_threads(numberThreads);
 
-    #pragma omp parallel private(a, b, x, y, r, i, j, k) shared(v, v_old)
+    #pragma omp parallel private(a, b, k, normaV, normaV_old, normaDif) shared(v, v_old)
     {
+        #pragma omp for schedule(dynamic, chunk)
+
         for(k = 0; k < maxIt; k++){
 
             for(a = 0; a < N; a++)
             for(b = 0; b < N; b++)
                 v_old[a][b] = v[a][b];
             
-            #pragma omp for schedule(dynamic, chunk) collapse(2)
+            potentialCalc(v, v_old, dx, dy);
 
-            for(i = 1; i < N-1; i++){
-                for(j = N/2; j < N-1; j++){
+            normaV = infinityNorm(v, N, N);
+            normaV_old = infinityNorm(v_old, N, N);
+            normaDif = fabs((normaV - normaV_old)/normaV_old);
 
-                    x = xInicial + i*dx;
-                    y = yInicial + j*dy;
-                    r = sqrt(x*x + y*y);
-                    if(fabs(raioExterno - r) < tolerance && (v[i][j] == potencialExterno )){
-                        v[i][j] = potencialExterno;
-                    }
-                    else{
-                        if(fabs(raioInterno - r) < tolerance && (v[i][j] == potencialInterno)){
-                            v[i][j] = potencialInterno;
-                        }
-                        else{
-                            v[i][j] = (1.0/4.0)*(v_old[i+1][j] + v_old[i-1][j] + v_old[i][j+1] + v_old[i][j-1]); 
-                            v[i][N-j-1] = v[i][j];
-                        }
-                    }
-                }
+            if(normaDif < errorTolerance){
+                k = maxIt;
             }
         }
     }
@@ -145,7 +178,10 @@ int main(int argc, char *argv[]){
     double **v, **v_old;
 
     numberThreads = atoi(argv[1]);
-    chunk = N/numberThreads;
+
+    printf("\nNumero de threads: %d\n", numberThreads);
+    
+    chunk = maxIt/numberThreads;
 
     dx = (xFinal - xInicial)/N;
     dy = (yFinal - yInicial)/N;

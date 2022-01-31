@@ -4,7 +4,7 @@
 void main() {
 
     double minuto, segundos, tempo;
-    int threads=2;
+    int threads=1;
 
     FILE *file;
 
@@ -12,7 +12,7 @@ void main() {
 
     fprintf(file, "tempos\tthreads\n");
 
-    while(threads > 48){
+    while(threads <= 8){
 
         printf("\nDigite o tempo em minutos: ");
         scanf("%lf", &minuto);

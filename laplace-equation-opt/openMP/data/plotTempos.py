@@ -20,4 +20,4 @@ axes.legend(loc='upper right')
 
 #plt.show()
 plt.grid(linestyle='-', linewidth=0.5)
-plt.savefig("plotTimePessoal.pdf",dpi=600)
+plt.savefig("plotTimePessoal2.pdf",dpi=300)

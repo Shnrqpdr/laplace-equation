@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --nodes=1           #Numero de Nós
 #SBATCH --ntasks-per-node=1  #Numero de tarefas por Nó
-#SBATCH --cpus-per-task=24   #Numero de threads por tarefa MPI
-#SBATCH -p cpu_dev         #Fila (partition) a ser utilizada
+#SBATCH --cpus-per-task=48   #Numero de threads por tarefa MPI
+#SBATCH -p sequana_cpu_dev         #Fila (partition) a ser utilizada
 #SBATCH -J ProjetoPedro   #Nome job
 #SBATCH --exclusive          #Utilização exclusiva dos nós durante a execução do job
 
@@ -12,16 +12,16 @@ nodeset -e $SLURM_JOB_NODELIST
 
 cd $SLURM_SUBMIT_DIR
 
-gcc -O2 -fexpensive-optimizations -m64 -foptimize-register-move -funroll-loops -ffast-math -mtune=native -march=native -fopenmp eletric-potential.c -o laplace.x -lm
-
 module load gcc/11.1
+
+gcc -O2 -fexpensive-optimizations -m64 -foptimize-register-move -funroll-loops -ffast-math -mtune=native -march=native -fopenmp eletric-potential.c -o laplace.x -lm
 
 EXEC=/scratch/uff21hpc/pedro.cunha/Projeto/openMP/laplace.x
 
 /usr/bin/ldd $EXEC
 
 
-for i in $(seq 10 24)
+for i in $(seq 32 2 48)
 do
-	{ time srun -c $i $EXEC $i ; } 2> tempo_thread_$i.txt
+	{ time srun -c $i $EXEC $i ; } 2> tempo_thread_sequana_$i.txt
 done

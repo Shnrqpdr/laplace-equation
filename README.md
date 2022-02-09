@@ -19,17 +19,12 @@
         >> make
         >> time ./laplace.x
 
+        Caso deseje rodar o programa com multithreading, deverá passar o número de threads
+        que deseja utilizar juntamente do executavel do programa:
+
+        >> time ./laplace.x 8                                                  (8 threads)
+
         O comando "time" irá captar o tempo de execução do programa.
-
-    ! INSTRUÇÕES DE USO EXCEPCIONAIS !
-
-        Caso disponha das bibliotecas numpy, matplotlib e pandas em seu computador,
-        poderá rodar o programa e plotar a saída de dados, resultando em uma figura PNG. 
-        Nesse caso, basta utilizar os comandos:
-
-        >> make
-        >> chmod +x script.sh
-        >> time ./script.sh
 
 ------------------------------------------------------------------------------------------- %
 
@@ -41,8 +36,8 @@
 ------------------------------------------------------------------------------------------- %
 
     Nesse projeto temos duas versões do mesmo cálculo, uma utilizando o método de diferenças
-    finitas de forma serial, resolvendo o problema de forma convencional. A outra versão se
-    trata do cálculo do mesmo problema utilizando multithreading, com os artifícios da API 
+    finitas de forma serial e inicial, resolvendo o problema de forma convencional. A outra 
+    versão se trata do cálculo do mesmo problema utilizando multithreading, com os artifícios da API 
     OpenMP.
 
 ------------------------------------------------------------------------------------------- %

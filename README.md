@@ -9,6 +9,8 @@
     Caso deseje utilizar outros números para fazer a simulação, basta muda-los
     no codigo eletric-potential.c, na parte de "Declarações e Constantes".
 
+    <img height="400" src="./projecao.png">
+
 ------------------------------------------------------------------------------------------- %
 
     ! INSTRUÇÕES DE USO CONVENCIONAIS !

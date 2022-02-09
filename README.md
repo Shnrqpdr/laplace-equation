@@ -9,7 +9,8 @@
     Caso deseje utilizar outros números para fazer a simulação, basta muda-los
     no codigo eletric-potential.c, na parte de "Declarações e Constantes".
 
-    ![Potencial eletrostático](https://github.com/Shnrqpdr/HPC/blob/master/projecao.png?raw=true)
+    Juntamente do projeto, há um relatório contendo toda a metodologia utilizada, além de uma
+    discussão a respeito da utilizando de multithreading no programa.
 
 ------------------------------------------------------------------------------------------- %
 

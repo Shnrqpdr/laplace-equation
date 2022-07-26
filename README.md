@@ -1,6 +1,4 @@
--------------------------------------------------------------------------------------------- %
-
-                                ------- HPC 1 --------
+# Equação de Laplace
 
     Nesse repositório, resolvemos a equação de laplace aplicando condições de contorno 
     sob duas circunferência que possui um corte de um arco por um certo ângulo que 
@@ -14,7 +12,7 @@
 
 ------------------------------------------------------------------------------------------- %
 
-    ! INSTRUÇÕES DE USO CONVENCIONAIS !
+# INSTRUÇÕES DE USO CONVENCIONAIS 
 
         Para compilar o programa, utilizamos o MAKEFILE, portanto basta 
         utilizar os seguintes comandos para compilar e rodar o programa:
